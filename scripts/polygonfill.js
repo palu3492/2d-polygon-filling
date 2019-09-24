@@ -8,9 +8,9 @@ var polygons = {
             // fill in vertices here!
             {x: 100,y:100},
             {x: 200,y:200},
-            {x: 300,y:200},
+            {x: 300,y:220},
             {x: 400,y:100},
-            {x: 400,y:10},
+            {x: 370,y:10},
             {x: 150,y:50},
             {x: 100,y:100}
         ]
@@ -107,26 +107,35 @@ function DrawPolygon(polygon) {
             break;
         }
     }
+    y = 150;
 
     active_list.InsertEdge(edge_table[y].first_entry);
+    active_list.InsertEdge(edge_table[y].first_entry.next_entry);
     active_list.SortList();
 
     // Step 3: Repeat until ET[y] is NULL and AL is NULL
     while(edge_table[y].first_entry !== null && active_list.first_entry !== null){
-        //edge_table[y].first_entry;
-        // first_entry.next_entry
-        //active_list.first_entry = edge_table[y].first_entry;
-        //active_list.SortList();
-        //console.log(active_list);
+        //break;
+        // Remove all edge buckets whose ymax is equal or greater than the scanline
+        // xofymin
         // loop through active_list, if ymax = y then remove entry;
-        if(active_list.first_entry.next_entry !== null){
-            let x1 = active_list.first_entry.x;
-            let x2 = active_list.first_entry.next_entry.x;
-            DrawLine(x1, y, x2, y);
-        }
+        //if(active_list.first_entry.next_entry !== null){
+        console.log(active_list);
+        let first = active_list.first_entry;
+        let x1 = first.x + ((first.y_max - y)*first.inv_slope);
+        let second = active_list.first_entry.next_entry;
+        let x2 = second.x + ((second.y_max - y)*second.inv_slope);
+        //let x1 = active_list.first_entry.x;
+        //let x2 = active_list.first_entry.next_entry.x;
+        console.log(x1, x2);
+        DrawLine(x1, y, x2, y);
+
+        active_list.RemoveCompleteEdges(y);
+        //break;
 
         y++;
         active_list.InsertEdge(edge_table[y].first_entry);
+        //active_list.InsertEdge(edge_table[y].first_entry.next_entry);
         active_list.SortList();
     }
     //   a) Move all entries at ET[y] into AL
@@ -145,7 +154,7 @@ function SelectNewPolygon() {
 }
 
 function DrawLine(x1, y1, x2, y2) {
-    console.log('Draw line');
+    //console.log('Draw line');
     ctx.beginPath();
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
@@ -160,4 +169,5 @@ function drawEdges(){
         vertex2 = vertices[i+1];
         DrawLine(vertex1.x, vertex1.y, vertex2.x, vertex2.y);
     }
+    DrawLine(0, 140, 800, 140);
 }
