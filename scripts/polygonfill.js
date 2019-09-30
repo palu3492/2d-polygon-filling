@@ -36,9 +36,9 @@ var polygons = {
         vertices: [
             // fill in vertices here!
             {x: 180,y:200},
-            {x: 300,y:120},
-            {x: 400,y:210},
-            {x: 300,y:300},
+            {x: 300,y:100},
+            {x: 400,y:220},
+            {x: 300,y:290},
             {x: 200,y:100},
             {x: 180,y:200},
         ]
@@ -48,6 +48,12 @@ var polygons = {
         color: 'rgb(255, 255, 10)', // choose color here!
         vertices: [
             // fill in vertices here!
+            {x: 100,y:50},
+            {x: 150,y:250},
+            {x: 200,y:50},
+            {x: 70,y:150},
+            {x: 270,y:150},
+            {x: 100,y:50},
         ]
     }
 };
@@ -144,7 +150,7 @@ function drawLinesBetweenEdges(edge_table, active_list, y){
     let edgeTableEntry = edge_table[y].first_entry;
     // while new edges exist
     while(edgeTableEntry != null) {
-        active_list = fillActiveList(active_list, edgeTableEntry, y); // Move all entries at ET[y] to AL
+        active_list = fillActiveList(active_list, edgeTableEntry); // Move all entries at ET[y] to AL
         active_list.SortList(); // Sort AL to maintain ascending x order
         active_list.RemoveCompleteEdges(y); // Remove entries from AL whose y_max equal y
         y = drawLinesBetweenActiveListEdges(active_list, y);
@@ -155,7 +161,7 @@ function drawLinesBetweenEdges(edge_table, active_list, y){
 }
 
 // Move all entries at ET[y] to AL
-function fillActiveList(active_list, edgeTableEntry, y){
+function fillActiveList(active_list, edgeTableEntry){
     active_list.InsertEdge(edgeTableEntry);
     while (edgeTableEntry.next_entry !== null) {
         active_list.InsertEdge(edgeTableEntry.next_entry);
@@ -165,16 +171,23 @@ function fillActiveList(active_list, edgeTableEntry, y){
 }
 
 function drawLinesBetweenActiveListEdges(active_list, y){
-    let activeTableEntry = active_list.first_entry;
-    let activeTableNextEntry = active_list.first_entry.next_entry;
-    let smallerY = Math.min(activeTableEntry.y_max, activeTableNextEntry.y_max);
-    while (y < smallerY) {
-        DrawLine(activeTableEntry.x, y, activeTableNextEntry.x, y);
-        activeTableEntry.x += activeTableEntry.inv_slope;
-        activeTableNextEntry.x += activeTableNextEntry.inv_slope;
-        y += 1;
+    let newY;
+    let activeListEntry = active_list.first_entry;
+    let activeListNextEntry = activeListEntry.next_entry;
+    // not sure this while is needed
+    while(activeListEntry !== null) {
+        activeListNextEntry = activeListEntry.next_entry;
+        let smallerY = Math.min(activeListEntry.y_max, activeListNextEntry.y_max);
+        newY = y;
+        while (newY < smallerY) {
+            DrawLine(activeListEntry.x, newY, activeListNextEntry.x, newY);
+            activeListEntry.x += activeListEntry.inv_slope;
+            activeListNextEntry.x += activeListNextEntry.inv_slope;
+            newY += 1;
+        }
+        activeListEntry = activeListNextEntry.next_entry;
     }
-    return y;
+    return newY;
 }
 
 // SelectNewPolygon(): triggered when new selection in drop down menu is made
