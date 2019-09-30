@@ -13,7 +13,7 @@ class EdgeEntry {
             this.next_entry = null;
         }
     }
-};
+}
 
 class EdgeList {
     constructor() {
@@ -80,4 +80,4 @@ class EdgeList {
             }
         } while (swapped);
     }
-};
+}
