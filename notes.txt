@@ -1,0 +1,10 @@
+Assignment 1  -  2D Polygon Filling
+
+Live website URL: https://palu3492.github.io/cisc490-project-1/
+GitHub repo: https://github.com/palu3492/cisc490-project-1
+
+Rubric checklist:
+Convex, concave, self-intersecting, and self-intersecting with an interior hole polygons are all properly drawn using the Edge Coherence Polygon Filling algorithm.
+I have defined one of each with a unique color to demonstrate this on the canvas.
+
+Expected score: 40/40

@@ -144,8 +144,6 @@ function fillEdgeTable(polygon, edge_table){
         deltaY = vertex2.y - vertex1.y;
         edge = new EdgeEntry(yMax, xYMin, deltaX, deltaY);
         edge_table[yMin].InsertEdge(edge); // Store entries at Y-coordinate of bottom vertex
-
-        // DrawLine(vertex1.x, vertex1.y, vertex2.x, vertex2.y);
     }
     return edge_table;
 }
@@ -167,7 +165,6 @@ function drawLinesBetweenEdges(edge_table, active_list, y){
         active_list = fillActiveList(active_list, edgeTableEntry); // Move all entries at ET[y] to AL
         active_list.SortList(); // Sort AL to maintain ascending x order
         active_list.RemoveCompleteEdges(y); // Remove edges that are no longer needed
-        //active_list = removeEntriesYMax(active_list, y);// Remove entries from AL whose y_max equal y
         y = drawLinesBetweenActiveListEdges(active_list, y);
         edgeTableEntry = edge_table[y].first_entry;
 
@@ -227,6 +224,6 @@ function drawEdges(polygon){
     for(let i=0; i<vertices.length-1; i++){
         vertex1 = vertices[i];
         vertex2 = vertices[i+1];
-        DrawLine(vertex1.x, vertex1.y, vertex2.x, vertex2.y);
+        DrawLine(vertex1.x + 150, vertex1.y + 200, vertex2.x + 150, vertex2.y + 200);
     }
 }
