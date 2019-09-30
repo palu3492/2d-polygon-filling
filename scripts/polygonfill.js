@@ -3,7 +3,7 @@ var ctx;
 var polygons = {
     convex: {
         type: 'convex',
-        color: 'rgba(10, 10, 255, 1)', // choose color here!
+        color: 'rgba(10, 10, 255, 1)', // BLUE
         vertices: [
             // fill in vertices here!
             {x: 100,y:100},
@@ -17,44 +17,51 @@ var polygons = {
     },
     concave: {
         type: 'concave',
-        color: 'rgb(255, 10, 10)', // choose color here!
+        color: 'rgb(255, 10, 10)', // RED
         vertices: [
             // fill in vertices here!
             {x: 100,y:100},
             {x: 200,y:200},
             {x: 300,y:220},
             {x: 200,y:100},
+            {x: 300,y:100},
+            {x: 280,y:50},
+            {x: 340,y:100},
             {x: 400,y:100},
             {x: 370,y:10},
-            //{x: 350,y:65},
-            //{x: 325,y:20},
+            {x: 350,y:50},
+            {x: 325,y:10},
             {x: 150,y:50},
             {x: 100,y:100}
         ]
     },
     self_intersect: {
         type: 'self_intersect',
-        color: 'rgb(10, 255, 10)', // choose color here!
+        color: 'rgb(10, 255, 10)', // GREEN
         vertices: [
             // fill in vertices here!
             {x: 200,y: 100},
-            {x: 300,y: 80},
-            {x: 200,y: 200},
-            {x: 300,y: 220},
+            {x: 350,y: 80},
+            {x: 200,y: 250},
+            {x: 350,y: 270},
             {x: 200,y: 100},
         ]
     },
     interior_hole: {
         type: 'interior_hole',
-        color: 'rgb(255, 255, 10)', // choose color here!
+        color: 'rgb(255, 255, 10)', // YELLOW
         vertices: [
             // fill in vertices here!
-            {x: 100,y:50},
-            {x: 150,y:250},
-            {x: 200,y:50},
-            {x: 70,y:150},
-            {x: 270,y:150},
-            {x: 100,y:50},
+            {x: 200,y: 50},
+            {x: 170,y: 150},
+            {x: 220,y: 180},
+            {x: 250,y: 180},
+            {x: 220,y: 100},
+            {x: 310,y: 150},
+            {x: 100,y: 210},
+            {x: 330,y: 180},
+            {x: 330,y: 100},
+            {x: 200,y: 50},
         ]
     }
 };
@@ -62,8 +69,7 @@ var polygons = {
 // Init(): triggered when web page loads
 function Init() {
     var w = 800;
-    //var h = 600;
-    var h = 300;
+    var h = 600;
     view = document.getElementById('view');
     view.width = w;
     view.height = h;
@@ -114,7 +120,7 @@ function DrawPolygon(polygon) {
     drawLinesBetweenEdges(edge_table, active_list, y);
 
     ctx.strokeStyle = 'rgba(10, 10, 255, 1)';
-    drawEdges(polygon);
+    //drawEdges(polygon);
 }
 
 // Fill the Edge Table with polygon edges using polygon vertices
@@ -155,7 +161,6 @@ function findFirstEdgeY(edge_table){
 }
 
 function drawLinesBetweenEdges(edge_table, active_list, y){
-
     let edgeTableEntry = edge_table[y].first_entry;
     // while new edges exist
     while(edgeTableEntry !== null) {
@@ -165,20 +170,8 @@ function drawLinesBetweenEdges(edge_table, active_list, y){
         //active_list = removeEntriesYMax(active_list, y);// Remove entries from AL whose y_max equal y
         y = drawLinesBetweenActiveListEdges(active_list, y);
         edgeTableEntry = edge_table[y].first_entry;
-    }
 
-    /*
-    console.log(edge_table);
-    let edgeTableEntry; // = edge_table[y].first_entry;
-    do{
-        edgeTableEntry = edge_table[y].first_entry;
-        active_list.first_entry = null;
-        active_list = fillActiveList(active_list, edgeTableEntry); // Move all entries at ET[y] to AL
-        active_list.SortList(); // Sort AL to maintain ascending x order
-        active_list.RemoveCompleteEdges(y); // Remove entries from AL whose y_max equal y
-        y = drawLinesBetweenActiveListEdges(active_list, y);
-    }while(edgeTableEntry !== null && active_list.first_entry !== null);
-    */
+    }
 }
 
 // Move all entries at ET[y] to AL
@@ -191,29 +184,6 @@ function fillActiveList(active_list, edgeTableEntry){
     return active_list;
 }
 
-function removeEntriesYMax(active_list, y){
-    let activeListEntry = active_list.first_entry;
-    let activeListNextEntry, activeListPrevEntry = null;
-    while(activeListEntry !== null) {
-        activeListNextEntry = activeListEntry.next_entry;
-        if(activeListEntry.y_max === y){
-            console.log('remove');
-            // Remove edge
-            if(activeListPrevEntry !== null){
-                activeListPrevEntry.next_entry = activeListNextEntry;
-            }else{
-                active_list.first_entry = activeListNextEntry;
-            }
-            activeListEntry = activeListNextEntry;
-        }else {
-            console.log('dont remove');
-            activeListPrevEntry = activeListEntry;
-            activeListEntry = activeListNextEntry;
-        }
-    }
-    return active_list;
-}
-
 function drawLinesBetweenActiveListEdges(active_list, y){
     let newY;
     let activeListEntry = active_list.first_entry;
@@ -222,8 +192,10 @@ function drawLinesBetweenActiveListEdges(active_list, y){
         activeListNextEntry = activeListEntry.next_entry;
         let smallerY = Math.min(activeListEntry.y_max, activeListNextEntry.y_max);
         newY = y;
+        // DrawLine(0, y, 800, y);
         while (newY < smallerY) {
-            DrawLine(activeListEntry.x, newY, activeListNextEntry.x, newY);
+            // add numbers here to center polygons in canvas
+            DrawLine(activeListEntry.x + 150, newY  + 200, activeListNextEntry.x  + 150, newY  + 200);
             activeListEntry.x += activeListEntry.inv_slope;
             activeListNextEntry.x += activeListNextEntry.inv_slope;
             newY += 1;
