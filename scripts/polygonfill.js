@@ -26,6 +26,8 @@ var polygons = {
             {x: 200,y:100},
             {x: 400,y:100},
             {x: 370,y:10},
+            //{x: 350,y:65},
+            //{x: 325,y:20},
             {x: 150,y:50},
             {x: 100,y:100}
         ]
@@ -35,12 +37,11 @@ var polygons = {
         color: 'rgb(10, 255, 10)', // choose color here!
         vertices: [
             // fill in vertices here!
-            {x: 180,y:200},
-            {x: 300,y:100},
-            {x: 400,y:220},
-            {x: 300,y:290},
-            {x: 200,y:100},
-            {x: 180,y:200},
+            {x: 200,y: 100},
+            {x: 300,y: 80},
+            {x: 200,y: 200},
+            {x: 300,y: 220},
+            {x: 200,y: 100},
         ]
     },
     interior_hole: {
@@ -99,10 +100,17 @@ function DrawPolygon(polygon) {
             - 1/slope: deltaX/deltaY (inverse slope)
      */
 
+    // Step 1: populate ET with edges of polygon
     edge_table = fillEdgeTable(polygon, edge_table);
-
+    // Step 2: set y to first scan line with an entry in ET
     let y = findFirstEdgeY(edge_table);
-
+    // Step 3: Repeat until ET[y] is empty and AL is empty
+    //   a) Move all entries at ET[y] into AL
+    //   b) Sort AL to maintain ascending x-value order
+    //   c) Remove entries from AL whose ymax equals y
+    //   d) Draw horizontal line for each span (pairs of entries in the AL)
+    //   e) Increment y by 1
+    //   f) Update x-values for all remaining entries in the AL (increment by 1/m)
     drawLinesBetweenEdges(edge_table, active_list, y);
 
     ctx.strokeStyle = 'rgba(10, 10, 255, 1)';
@@ -147,17 +155,30 @@ function findFirstEdgeY(edge_table){
 }
 
 function drawLinesBetweenEdges(edge_table, active_list, y){
+
     let edgeTableEntry = edge_table[y].first_entry;
     // while new edges exist
-    while(edgeTableEntry != null) {
+    while(edgeTableEntry !== null) {
+        active_list = fillActiveList(active_list, edgeTableEntry); // Move all entries at ET[y] to AL
+        active_list.SortList(); // Sort AL to maintain ascending x order
+        active_list.RemoveCompleteEdges(y); // Remove edges that are no longer needed
+        //active_list = removeEntriesYMax(active_list, y);// Remove entries from AL whose y_max equal y
+        y = drawLinesBetweenActiveListEdges(active_list, y);
+        edgeTableEntry = edge_table[y].first_entry;
+    }
+
+    /*
+    console.log(edge_table);
+    let edgeTableEntry; // = edge_table[y].first_entry;
+    do{
+        edgeTableEntry = edge_table[y].first_entry;
+        active_list.first_entry = null;
         active_list = fillActiveList(active_list, edgeTableEntry); // Move all entries at ET[y] to AL
         active_list.SortList(); // Sort AL to maintain ascending x order
         active_list.RemoveCompleteEdges(y); // Remove entries from AL whose y_max equal y
         y = drawLinesBetweenActiveListEdges(active_list, y);
-
-        edgeTableEntry = edge_table[y].first_entry;
-
-    }
+    }while(edgeTableEntry !== null && active_list.first_entry !== null);
+    */
 }
 
 // Move all entries at ET[y] to AL
@@ -170,11 +191,33 @@ function fillActiveList(active_list, edgeTableEntry){
     return active_list;
 }
 
+function removeEntriesYMax(active_list, y){
+    let activeListEntry = active_list.first_entry;
+    let activeListNextEntry, activeListPrevEntry = null;
+    while(activeListEntry !== null) {
+        activeListNextEntry = activeListEntry.next_entry;
+        if(activeListEntry.y_max === y){
+            console.log('remove');
+            // Remove edge
+            if(activeListPrevEntry !== null){
+                activeListPrevEntry.next_entry = activeListNextEntry;
+            }else{
+                active_list.first_entry = activeListNextEntry;
+            }
+            activeListEntry = activeListNextEntry;
+        }else {
+            console.log('dont remove');
+            activeListPrevEntry = activeListEntry;
+            activeListEntry = activeListNextEntry;
+        }
+    }
+    return active_list;
+}
+
 function drawLinesBetweenActiveListEdges(active_list, y){
     let newY;
     let activeListEntry = active_list.first_entry;
-    let activeListNextEntry = activeListEntry.next_entry;
-    // not sure this while is needed
+    let activeListNextEntry;
     while(activeListEntry !== null) {
         activeListNextEntry = activeListEntry.next_entry;
         let smallerY = Math.min(activeListEntry.y_max, activeListNextEntry.y_max);
