@@ -1,5 +1,3 @@
 # Edge Coherence Polygon Filling
 
-## Alex Palumbo
-
-Live website: https://palu3492.github.io/cisc490-project-1/
+View online: https://palu3492.github.io/2d-polygon-filling/
